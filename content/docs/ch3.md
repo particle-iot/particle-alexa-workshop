@@ -16,7 +16,7 @@ Make sure you have completed **all** the [preparations](README.md) before advanc
 
 Our recommendation is to use the same credentials you use when shopping at amazon.com.  This will make your life much easier when you want to test your Alexa skills on your own devices.
 
-1. Visit the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask)
+1. Visit the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask) and log in.
 
 ## Create Your Alexa Skill
 
@@ -50,138 +50,48 @@ The Developer Console will create your skill for you.  This should take 60-90 se
 
 The first screen you see has lots of information on it, but our focus will be exclusively on the navigation on the left and top of the screen.
 
-1. In the left-side navigation, select "Invocation".  We need to change this value ("change me") to be what our users will call our skill: "Particle Control".
+1. In the left-side navigation, select "Invocation".
 
-2. Click the "Save Model" button above.
+2. Change the default value ("change me") to be what our users will call our skill: "particle control".  (Make sure to use all lower case letters.)
+
+3. Click the "Save Model" button above.
 
 ![](./images/03/alexa_save_model_button.png)
 
-First, you will set up your Argon and claim it to your Particle account.
+4. Click the "Build Model" button above.  This will take approximately 45 seconds.
 
-1. Open your glorious new Argon Kit. Attach the Wi-Fi antenna to the u.fl connector labeled _WIFI_. Afterwards, use the USB cable to plug the Argon into your computer. This should power up your device; you'll see LEDs illuminate and bliniking.
+![](./images/03/alexa_build_model_button.png)
 
-![](./images/01/Argon-plugged-in.jpg)
+5. In the left-side navigation, click the "HelloWorldIntent".
 
-2. Once the Argon powers up for the first time, it will automatically enter "[listening mode](https://docs.particle.io/tutorials/device-os/led/argon/#listening-mode)" (indicated by the RGB LED blinking blue). This means your device is ready to be claimed.
+Here, you can see the list of sample utterances that have been created for this intent.  You can add more, or leave them as is.  (If you make changes, you will need to "Save" and "Build" again.)
 
-If you need to actively put your device in to "Listening Mode", hold down the `MODE` button for three seconds, until the RGB LED begins blinking blue.
+6. In the top navigation, click the "Code" button.
 
-3. Make sure your phone has Bluetooth turned on. Open the Particle Mobile App and login to your particle account, if you have not already.
+This is the node.js function that has been created for our simple Hello World skill.  There are several sections to this code, one for each type of response we expect from our users.  Here's the quick highlights:
 
-![](./images/01/app-login-filled.png)
+* Line 6: The LaunchRequestHandler is called when the user opens your skill by saying "open particle control".
+* Line 18: The HelloWorldIntentHandler is called when the user says one of the sample utterances (or something similar) from our HelloWorldIntent.
+* Line 108: This is the entry point to our skill, and it has a list of all of the handler functions we want available in our code.
 
-4.  On the "Your Devices" screen, click the "+" icon to add a new device. Choose the "Argon/Boron/Xenon" option.
+7. In the top navigation, click the "Test" button.
 
-<img src="./images/01/app-your-devices-empty.png" class="two-per-line" />
-<img src="./images/01/app-add-device.png" class="two-per-line" />
+8. Change the testing dropdown from "Off" to "Development."
 
-5.  The next screen will instruct you to find the data matrix printed on your Argon. Using your phone's camera, scan the code. 
+![](./images/03/alexa_test_is_disabled_dropdown.png)
 
-::: tip Give the app Camera permissions
-Make sure to allow the app to access your camera to complete this step.
-::: 
+9. In the Alexa Simulator, type "open particle test", and press Enter.
 
-<img src="./images/01/app-argon-scan-sticker.png" class="two-per-line" />
-<img src="./images/01/app-argon-scan-sticker2.png" class="two-per-line" />
+![](./images/03/alexa_simulator_open_particle_test.png)
 
-<img src="./images/01/app-argon-get-ready.png" class="two-per-line" />
-<img src="./images/01/app-argon-paired.png" class="two-per-line" />
+10. You should receive a response that says "Welcome, you can say Hello or Help.  Which would you like to try?"
 
-6. The app will now use Bluetooth to pair with your device. If this is the first time your Argon is connected, it is probably due for a device OS update. This is handled automatically by the App — this may take some time, depending on the number of updates pending.
+![](./images/03/alexa_chat_box.png)
 
-<img src="./images/01/app-update-device-os.png" class="two-per-line" />
-<img src="./images/01/app-updating-device-os.jpg" class="two-per-line" />
+You should also review the JSON Input and JSON Output boxes.  The input JSON is what Alexa sent to your code, and the output JSON is what your code sent back to Alexa.  This will become more important in Lab 4, when we add new intents and custom responses.  Notice the "LauchRequest" at the bottom of the input JSON.  This indicates that the user opened our skill.
 
-7. After the update is complete, the <!--Argon will return to listening mode (blinking blue) and the-->app will ask if you want to add the Argon to a mesh network. For now, select "_NO, DON'T USE IN MESH_," as you will explore the mesh networking capabilities later on.
+11. In the Alexa Simulator, type "hello", and press Enter.
 
-![](./images/01/app-argon-use-in-mesh.png)
+You should get a response back from your skill that says "Hello World."  Notice that the input JSON contains the HelloWorldIntent this time, because the user said something that matches the sample utterances for that intent.
 
-8. Conecct your device to the cloud, by providing it with Wi-Fi. Select the Wi-Fi you intend to use, and enter the password.
-
-<img src="./images/01/app-argon-choose-wifi.png" class="two-per-line" />
-<img src="./images/01/app-argon-connecting-to-cloud.png" class="two-per-line" />
-
-9. When your device has connected successfully, you may give it a name. After that, exit the setup.
-
-<img src="./images/01/app-argon-give-name.png" class="two-per-line" />
-<img src="./images/01/app-lets-get-building.png" class="two-per-line" />
-
-Congratulations, you've claimed your first Argon. Now, you'll program it to blink an LED.
-
-## Program your device
-
-To program (aka flash) your device, you'll use the [Particle Web IDE](https://build.particle.io/build/)
-
-::: tip Flashing... what's flashing?
-Flashing is hardware-speak for sending code to a device. For Particle devices, this can be done from the Web IDE, Particle Workbench, or the Command-Line Interface (often abbreviated as CLI).
-:::
-
-1. Go to the [Particle Web IDE](https://build.particle.io/build/) and login if you have not already.
-
-2. Create a new app by submitting a title (e.g. "blinky") and press enter.
-
-![](./images/01/webide-new-app.png)
-
-3. You should now have a right-side section (the code pane) with two empty functions declared.
-
-![](./images/01/webide-empty-app.png)
-
-At this point, your goal is now to write code that turns the onboard blue LED on and off every second — a hardware equivalent of the classic "Hello world!".
-
-4. The physical pin connected to the blue LED is `D7`, you give it a name, so you can call it later on. Do this _above_ the `setup` function.
-
-```cpp
-// Blink an LED.
-// Declare variables.
-int ledPin = D7; // The onboard blue LED is connected to pin D7.
-```
-
-5. You now need to configure this pin as an output to be able to control the voltage (`HIGH` or `LOW`). This is done _inside_ the `setup` function.
-
-```cpp
-// Set the pin mode to output, so you may control it.
-pinMode(ledPin, OUTPUT);
-```
-
-6. Turn on the LED by setting the pin value to `HIGH`. This is done _inside_ the `loop` function.
-
-```cpp
-// Turn on the LED.
-digitalWrite(ledPin, HIGH);
-```
-
-7. To keep the LED on for a fixed amount of time before turning it off again, introduce a delay immediately after.
-
-```cpp
-// We'll leave it on for 1 second (1000milliseconds).
-delay(1000);
-```
-
-8. Now turn the LED off by setting the pin value `LOW`.
-
-```cpp
-// Turn off the LED.
-digitalWrite(ledPin, LOW);
-```
-
-9. To finalize the code, add a delay after turning the diode off, so it is off for a while, before the loop restarts and turns the diode back on again.
-
-```cpp
-// We'll leave it off for 1 second.
-delay(1000);
-```
-
-The "blinky" code is now complete, and it is time to flash it to your physical device.
-
-10. Choose which device to target with this code by clicking the crosshair icon in the left pane.
-
-![](./images/01/webide-devices.png)
-
-11. Your Argon should be in the list, if you have claimed it successfully. If it is online it will have a "breathing" cyan circle right of its name. If this is your first device, it will be selected automatically and you can flash code to it by clicking the lightning bolt icon. If you have other Particle devices associated to your account, click the star icon next to your new device to select it. Then, click the lightning bolt icon to flash.
-    ![](./images/01/webide-device-list.png)
-
-... and that's how you get to blinky!
-
-::: tip Got stuck in the code?
-The final code for this lab is [available here](https://go.particle.io/shared_apps/5bfefd038bf964af88000409).
-:::
+CONGRATULATIONS!  You have a working Hello World Alexa skill!  In Lab 4, we are going to modify this skill to call the Particle API to change the color of our LED, and determine the temperature and humidity of the room!
