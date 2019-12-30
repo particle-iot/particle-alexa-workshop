@@ -6,6 +6,8 @@ Now that you've gotten a survey of all that the Particle ecosystem offers, why n
 
 1. Play with [all those other Grove sensors in your Starter Kit](https://docs.particle.io/datasheets/accessories/mesh-accessories/) and build something awesome!
 
+2. Check out the [Alexa Cakewalk](https://developer.amazon.com/en-US/alexa/alexa-skills-kit/resources/training-resources/cake-walk) course to learn more about building engaging voice experiences!
+
 2.  Create a Particle-powered mobile app using our [iOS](https://docs.particle.io/reference/ios/), [Android](https://docs.particle.io/reference/android/), and [Windows](https://docs.particle.io/reference/windows/) SDKs.
 
 3.  Create a Particle-powered web app using the [Particle JS library](https://docs.particle.io/reference/javascript/) and your framework of choice, like [Vue.js](https://vuejs.org/), [React](https://reactjs.org/) and [Angular](https://angular.io/).
