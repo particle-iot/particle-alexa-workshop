@@ -19,3 +19,11 @@ Now that you've gotten a survey of all that the Particle ecosystem offers, why n
 - [Particle on Hackster.io](https://www.hackster.io/particle)
 
 And If you build something with Particle, we'd love to see it, and share it with the world! Just mention us on Twitter ([@particle](https://twitter.com/particle)) or Instagram ([@particle_io](https://www.instagram.com/particle_io/?hl=en)). We can't wait to see what you build!
+
+## Alexa Resources
+
+- [Technical Documentation](https://developer.amazon.com/en-US/docs/alexa/ask-overviews/build-skills-with-the-alexa-skills-kit.html)
+- [Alexa Forums](https://forums.developer.amazon.com/spaces/23/Alexa+Skills+Kit.html)
+- [Feature Requests](https://alexa.uservoice.com/)
+
+We are always excited to hear what you've created.  Let us know when you publish your skills!  You can find us on Twitter ([@alexadevs](http://twitter.com/alexadevs)), and we have weekly office hours with Alexa experts on [Twitch](https://www.twitch.tv/amazonalexa)!
