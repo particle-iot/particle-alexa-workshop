@@ -16,7 +16,9 @@ Head over to the [CodeMash Prerequisites site](http://prereqs.codemash.org/) and
   - Unbox a brand new Argon, claim it to your Particle account, and make it light up with Tinker.
 - Chapter 2: Particle Workbench, Primitives, and the Device Cloud
   - Read the Grove sensors included with the Grove Starter Kit for Particle Mesh, Use particle primities to expose sensor data to the cloud, trigger actions and fire events.
-- Chapter 3: Building Alexa Skills to Control Your Particle Devices
-  - Explore Particle Integrations and integrate your Particle project a custom Alexa Skill.
+- Chapter 3: Building an Alexa Skill
+  - Create an Alexa skill that will be the foundation for Chapter 4.
+- Chapter 4: Talking to Particle from Your Alexa Skill
+  - Explore Particle Integrations and integrate your Particle project into a custom Alexa Skill
 
 ---
