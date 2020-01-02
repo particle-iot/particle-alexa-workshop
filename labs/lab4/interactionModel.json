@@ -79,7 +79,8 @@
                         "change to {color}",
                         "{color}",
                         "set the LED to {color}",
-                        "change the color to {color}"
+                        "change the color to {color}",
+                        "turn the light {color}"
                     ]
                 }
             ],

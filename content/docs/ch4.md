@@ -352,6 +352,7 @@ Now that we have updated our code, we need to flash our device, and test that it
 * set the light to {color}
 * change the light to {color}
 * change the LED to {color}
+* turn the light {color}
 
 12. Adding those new sample utterances automatically created a slot for this intent.  We just need to set the slot type to be one of the built-in slot types: "AMAZON.Color".  This gives us a rich model that handles the name of all of the colors very effectively.
 
@@ -403,32 +404,9 @@ CONGRATULATIONS!  You've completed this entire workshop!  You now know how to bu
 
 If you got lost in the code, here are some resources for you.
 
-[Interaction Model Final Code]() - In the left navigation of the Build tab in the Alexa Developer Console, you can choose JSON Editor to replace the entire Interaction Model with this file.
-[index.js Final Code]()
-[particle.ino Final Code]()
-
-
-
-
-
-
-
-
-
-
-
-
-## GET YOUR PARTICLE TOKEN AND DEVICEID
-
-## MODIFY TOGGLELED TO TURN LIGHT ON OR OFF.
-
-## ADD INTENTS FOR SETTING COLOR
-
-## MODIFY TOGGLELED FUNCTION ON PARTICLE TO HANDLE NEW REQUESTS
-
-## ADD INTENTS FOR REQUESTING TEMPERATURE AND HUMIDITY
-
-## CREATE NEW PARTICLE FUNCTION FOR HANDLING REQUESTS FOR TEMP AND HUMIDITY.
+* [Alexa Interaction Model Final Code](https://github.com/bsatrom/particle-alexa-workshop/blob/master/labs/lab4/interactionModel.json) - In the left navigation of the Build tab in the Alexa Developer Console, you can choose JSON Editor to replace the entire Interaction Model with this file.
+* [index.js Final Code](https://github.com/bsatrom/particle-alexa-workshop/blob/master/labs/lab4/index.js)
+* [particle.ino Final Code](https://github.com/bsatrom/particle-alexa-workshop/blob/master/labs/lab4/particle.ino)
 
 **And if you want to take your exploration further, click the "Extra" link below!**
 
