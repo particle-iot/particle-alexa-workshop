@@ -87,6 +87,274 @@ This slot does not currently have a slot type selected, and we need to create on
 
 ![](./images/04/alexa_utterance_profiler.png)
 
+What you will see is the natural language understanding (NLU) results for your utterance against your Interaction Model.  It should show that the selected intent is "LightPowerIntent", and the slot value is "on".  We will be able to access these values in our code, and make decisions based on these values.
+
+![](./images/04/alexa_selected_intent.png)
+
+Now that we know our LightPowerIntent is working as expected, we can write the code for our device (and our skill) to make this magic happen.
+
+## Modifying our device firmware
+
+In order to allow our users to turn their light on or off, we need to add some additional code to the device firmware.  To do this, we are going to add a new variable, and a new function to handle powering the LED.
+
+1. Declare a new String variable called "lightpower". This can go immediately after the other variables you've declared, like "temp", "humidity", or "currentLightLevel".
+
+```cpp
+String lightpower;
+```
+
+2. In the setup() function, declare "lightpower" as a Particle variable.
+
+```cpp
+Particle.variable("lightpower", lightpower);
+```
+
+3. In the setup() function, declare "toggleLightPower" as a Particle function. (We haven't created this function yet, but that's our next step.)
+
+```cpp
+Particle.function("toggleLightPower", toggleLightPower);
+```
+
+4. At the very bottom of our code file, add the function toggleLightPower().  This function sets the light to on or off depending on the command we send, and if we don't provide a command, it toggles the state.
+
+```cpp
+int toggleLightPower(String command) {
+    if (command == "on") {
+        leds.setColorHSB(0, 0.0, 1.0, 1.0);
+        Particle.publish("[ON] Alexa updated lightpower state to ON.");
+        lightpower = command;
+        return 1;
+    }
+    else if (command == "off") {
+        leds.setColorHSB(0, 0.0, 0.0, 0.0);
+        Particle.publish("[OFF] Alexa updated lightpower state to OFF.");
+        lightpower = command;
+        return 1;
+    }
+    else {
+        if (lightpower == "on") toggleLightPower("off");
+        else if (lightpower == "off") toggleLightPower("on");
+    }
+}
+```
+
+Now that we have updated our code, we need to flash our device, and test that it is working properly.
+
+5. Flash your device with the new code.
+
+6. Go to your Particle Device Portal, and verify that your new functions and variables are listed on the right side of the screen.
+
+![](./images/04/alexa_device_portal.png)
+
+7. Type "on" into the "toggleLightPower" argument box, and press "Call."  It should turn your device's LED on.
+
+8. Type "off" into the "toggleLightPower" argument box, and press "Call."  It should turn your device's LED on.
+
+9. Click the "GET" button next to your "lightpower" variable, and it should tell you the current state of your device's LED.
+
+10. Type "toggle" into the "toggleLightPower" argument box, and press "Call."  It should change the state of your device's LED from on to off, or off to on, depending on where you started.  Sending any other command other than "on" or "off" will toggle the state of the LED to the opposite.
+
+## Updating our Alexa skill code
+
+1. Back in the Alexa Developer Console, click the code tab at the top of the screen.  We need to make several changes to our project in order to call the Particle APIs.
+
+2. First, click on the "package.json" file from the left navigation.
+
+![](./images/04/alexa_particle_json.png)
+
+3. We need to add the Particle API Library as a dependency.  Add this line to your dependencies (make sure you have all of your commas in the right place!):
+
+```cpp
+"particle-api-js": "^8.0.1"
+```
+
+Once you've added this, you can close this file.  We won't need it again.
+
+4. Open the index.js file from the left navigation.  (It might already be open, in which case you can just click on its tab.)
+
+5. We need to add a reference to to the Particle API library in our code.  To do this, add this line immediately below the reference to "ask-api-core".
+
+```cpp
+const Particle = require('particle-api-js');
+```
+
+6. We will also need our Particle device ID.  You can find this on the Particle website, at https://console.particle.io/devices.  Add a line of code below the Particle API declaration to declare this value as a variable.
+
+```cpp
+var deviceId = "YOUR_DEVICE_ID_HERE";
+```
+
+7. You will also need your Particle access token.  To find this, go to https://build.particle.io and click on the Settings icon in the bottom left corner.  It will show you your "Personal Access Token" in the Settings panel.  This is used to authenticate access to your account, so keep this value private.  Add this value to your code immediately below your deviceId:
+
+```cpp
+var token = "YOUR_PERSONAL_ACCESS_TOKEN_HERE";
+```
+
+Now that we have the basic plumbing out of the way, we can add the code that will actually make our light work with our voice.
+
+8. We are going to add a new handler, called "LightPowerIntentHandler" to handle our user's voice commands, and make the calls to our Particle device.  You can put this anywhere in your index.js file, just insert it between any of the other existing handlers.
+
+```cpp
+const LightPowerIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'LightPowerIntent';
+    },
+    handle(handlerInput) {
+        var command = "toggle";
+        if (handlerInput.requestEnvelope.request.intent.slots.OnOff.value !== undefined) command = handlerInput.requestEnvelope.request.intent.slots.OnOff.value;
+        var particle = new Particle();
+        particle.callFunction({ deviceId: deviceId, name: "toggleLightPower", argument: command.toString(), auth: token })
+        
+        var speakOutput = "Your LED state has been updated";
+        if (command !== "toggle") speakOutput += " to " + command + ".";
+        return handlerInput.responseBuilder
+            .speak(speakOutput + "<break time='.25s'/>What else can I do for you?")
+            .reprompt("What else can I do for you?")
+            .getResponse();
+    }
+}
+```
+
+In this handler, we are checking to make sure that the LightPowerIntent was requested by the user, and then we determine what their slot value was (either "on", "off" or undefined).  We then make a call to the Particle API with the deviceId, function name, and slot value, using our authentication token.  Finally, we create a sentence that lets the user know that we executed their request.
+
+9. The final step to make this work is to add the name of our handler to our exports.handler statement in the addRequestHandlers() method.  These handlers are checked in the order they are written, so it is recommended that you order your handlers in this list from most specific to least specific.  This becomes especially useful when you have a much more robust skill with dozens of handlers for different intents and states.  For our purposes today, put it immediately under the HelpIntentHandler, so that your list looks like this:
+
+```cpp
+.addRequestHandlers(
+    LaunchRequestHandler,
+    HelloWorldIntentHandler,
+    HelpIntentHandler,
+    LightPowerIntentHandler,
+    CancelAndStopIntentHandler,
+    SessionEndedRequestHandler,
+    IntentReflectorHandler, // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
+)
+```
+
+10. Click Save at the top of the screen.
+
+11. Click Deploy at the top of the screen.  We can now test our skill.
+
+12. Open the "Test" tab from the top navigation.
+
+13. In the Alexa Simulator, type "open particle control" and press Enter.
+
+14. After you recieve your response, type a second command: "turn on the light".  This should light up your LED.  (If your light is already on, tell it to "turn off the light".)
+
+Congratulations!  You now have an Alexa skill that can change the state of your LED on your Particle device!  We have much more functionality to add to this skill (and firmware), so let's keep going!  The steps required to accomplish these next sections will be much faster, since we did almost all of the plumbing for the first one.
+
+## Asking for the room temperature
+
+1. Create a new custom intent for our skill in the "Build" tab of the Alexa Developer Console, called "TemperatureIntent."  To do this, go to the "Build" tab of the Alexa Developer Console, and click the "Add" button next to "Intents".
+
+![](./images/04/alexa_add_intent_button.png)
+
+2. For the sample utterances, we won't have a slot this time.  We are only asking the device to tell us the current temperature detected by the Temperature and Humidity Sensor.  So you can use a list like the one below.  Feel free to add additional utterances that you think users might say when asking for the device temperature.
+
+* what is the temperature
+* give me the device temperature
+* temperature
+* temp
+* how warm is it
+* how cold is it
+* how many degrees is it
+* what does the temperature sensor say
+
+3. Build your model to finish this step.
+
+![](./images/03/alexa_build_model_button.png)
+
+4. Use the Evaluate Model tool to verify that your intent is working as expected.  Type "what is the temperature" to make sure your intent is being selected appropriately.
+
+![](./images/04/alexa_evaluate_model_button.png)
+
+5. Navigate back to the "Code" tab, where we will add another handler for our new intent to our index.js file.
+
+6. Add the following handler to your code.  This will make another call to the Particle API to retrieve the current value of "temp" that we created earlier.
+
+```cpp
+const TemperatureIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'TemperatureIntent';
+    },
+    async handle(handlerInput) {
+        var particle = new Particle();
+        return await particle.getVariable({ deviceId: deviceId, name: 'temp', auth: token }).then(function(data) {
+            console.log("RESULT = " + JSON.stringify(data));
+            var speakOutput = "Your temperature sensor says it is " + parseInt(data.body.result) + " degrees fahrenheit.";
+            return handlerInput.responseBuilder
+                .speak(speakOutput + "<break time='.25s'/>What else can I do for you?")
+                .reprompt("What else can I do for you?")
+                .getResponse();
+        }, function(err) { console.log('An error occurred while getting attrs:', err);return 0;});
+    }
+}
+```
+
+7. Make sure to add the name of the handler ("TemperatureIntentHandler") to the exports.handler list at the bottom of index.js.
+
+8. You can now test your skill on the "Test" tab, and ask for the temperature from your device!
+
+## Changing the color of the LED
+
+For this step, we will need to be able to translate color names into color values that our device can understand.  This will require another slot.
+
+1. Create a new custom intent for our skill in the "Build" tab of the Alexa Developer Console, called "ColorIntent."  To do this, go to the "Build" tab of the Alexa Developer Console, and click the "Add" button next to "Intents".
+
+![](./images/04/alexa_add_intent_button.png)
+
+2. To simplify this process, we recommend creating the slot type first.  In the left navigation, click "Add" next to "Slot Types".  Name the new slot type "ColorType"
+
+![](./images/04/alexa_add_slot_type_button.png)
+
+3. For the slot values, we will start with only the simple colors of the rainbow, and white.  You can add additional colors, but you will also need to [look up the additional HSL values for those colors](http://colorizer.org/).
+
+* red
+* orange
+* yellow
+* green
+* blue
+* purple
+* white
+
+4. Return back to your new "ColorIntent" intent.  We can now easily create our sample utterances using our new slot type.
+
+* change the color to {color}
+* set the LED to {color}
+* {color}
+* change to {color}
+* set the light to {color}
+* change the light to {color}
+* change the LED to {color}
+
+5. Adding those new sample utterances automatically created a slot for this intent.  We just need to set the slot type to be our "ColorType" slot type that we created earlier.
+
+![](./images/04/alexa_select_colortype.png)
+
+6. Build your model to finish this step.
+
+![](./images/03/alexa_build_model_button.png)
+
+7. Use the Evaluate Model tool to verify that your intent is working as expected.  Type "change the light to purple" to make sure your intent is being selected appropriately.
+
+![](./images/04/alexa_evaluate_model_button.png)
+
+There's an interesting lesson here before we move on.  Send another command to the Utterance Profiler: "change the light to lavender".  You should notice that our "ColorIntent" is still hit, and the slot value is actually "lavender", a color we didn't include in our slot!  Slots are machine learning models, and Alexa will interpret unexpected values based on what we provide her in the model.  Since "lavender" seems to be a good fit for our slot, it is provided to us.  This means that we will have to check for appropriate values in our code, and eliminate values we don't want to support.
+
+8. Navigate back to the "Code" tab, where we will add another handler for our new intent to our index.js file.
+
+9. 
+
+
+
+
+
+
+
+
+
 
 
 
