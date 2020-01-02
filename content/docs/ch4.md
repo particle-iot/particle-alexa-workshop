@@ -295,31 +295,55 @@ const TemperatureIntentHandler = {
 
 7. Make sure to add the name of the handler ("TemperatureIntentHandler") to the exports.handler list at the bottom of index.js.
 
+8. Save and Deploy your code.
+
 8. You can now test your skill on the "Test" tab, and ask for the temperature from your device!
 
 ## Changing the color of the LED
 
-For this step, we will need to be able to translate color names into color values that our device can understand.  This will require another slot.
+For this functionality, we will need to be able to translate color names into color values that our device can understand.  Let's start with the Particle firmware, since we will need a new function.
 
-1. Create a new custom intent for our skill in the "Build" tab of the Alexa Developer Console, called "ColorIntent."  To do this, go to the "Build" tab of the Alexa Developer Console, and click the "Add" button next to "Intents".
+1. Go back to the Particle Web IDE, and declare "toggleColor" as a new function in the setup() method.
+
+```cpp
+Particle.function("toggleColor", toggleColor);
+```
+
+2. Add this new function to the bottom of your firmware code.  As you can see, we will be translating color names to RGB values.  If you had a library with this data, you could support an infinite number of color names, but for our purposes in this lab, we'll restrict our list to just the common colors of the rainbow, and white.
+
+```cpp
+int toggleColor(String command) {
+    if (command == "red")         leds.setColorRGB(0, 255, 0, 0);
+    else if (command == "orange") leds.setColorRGB(0, 255, 165, 0);
+    else if (command == "yellow") leds.setColorRGB(0, 255, 255, 0);
+    else if (command == "green")  leds.setColorRGB(0, 0, 255, 0);
+    else if (command == "blue")   leds.setColorRGB(0, 0, 0, 255);
+    else if (command == "purple") leds.setColorRGB(0, 128, 0, 128);
+    else leds.setColorHSB(0, 255, 255, 255);
+
+    Particle.publish("[" + command.toUpperCase() + "] Alexa updated LED color to " + command + ".");
+    return 1;
+}
+```
+Now that we have updated our code, we need to flash our device, and test that it is working properly.
+
+5. Flash your device with the new code.
+
+6. Go to your Particle Device Portal, and verify that your new function is listed on the right side of the screen.
+
+![](./images/04/alexa_device_portal_2.png)
+
+7. Type "green" into the "toggleColor" argument box, and press "Call."  It should turn your device's LED on, and set it to green.
+
+8. Type "red" into the "toggleColor" argument box, and press "Call."  It should turn your device's LED on, and set it to red.
+
+9. Type "lavender" into the "toggleColor" argument box, and press "Call."  It should turn your device's LED on, and set it to WHITE.  This is because we don't support "lavender" as one of our colors.
+
+10. Create a new custom intent for our skill, called "ColorIntent."  To do this, go to the "Build" tab of the Alexa Developer Console, and click the "Add" button next to "Intents".
 
 ![](./images/04/alexa_add_intent_button.png)
 
-2. To simplify this process, we recommend creating the slot type first.  In the left navigation, click "Add" next to "Slot Types".  Name the new slot type "ColorType"
-
-![](./images/04/alexa_add_slot_type_button.png)
-
-3. For the slot values, we will start with only the simple colors of the rainbow, and white.  You can add additional colors, but you will also need to [look up the additional HSL values for those colors](http://colorizer.org/).
-
-* red
-* orange
-* yellow
-* green
-* blue
-* purple
-* white
-
-4. Return back to your new "ColorIntent" intent.  We can now easily create our sample utterances using our new slot type.
+11. Use these sample utterances for our new intent.
 
 * change the color to {color}
 * set the LED to {color}
@@ -329,23 +353,59 @@ For this step, we will need to be able to translate color names into color value
 * change the light to {color}
 * change the LED to {color}
 
-5. Adding those new sample utterances automatically created a slot for this intent.  We just need to set the slot type to be our "ColorType" slot type that we created earlier.
+12. Adding those new sample utterances automatically created a slot for this intent.  We just need to set the slot type to be one of the built-in slot types: "AMAZON.Color".  This gives us a rich model that handles the name of all of the colors very effectively.
 
-![](./images/04/alexa_select_colortype.png)
+![](./images/04/alexa_select_amazon_color_slottype.png)
 
-6. Build your model to finish this step.
+13. Build your model to finish this step.
 
 ![](./images/03/alexa_build_model_button.png)
 
-7. Use the Evaluate Model tool to verify that your intent is working as expected.  Type "change the light to purple" to make sure your intent is being selected appropriately.
+14. Use the Evaluate Model tool to verify that your intent is working as expected.  Type "change the light to purple" to make sure your intent is being selected appropriately.
 
 ![](./images/04/alexa_evaluate_model_button.png)
 
-There's an interesting lesson here before we move on.  Send another command to the Utterance Profiler: "change the light to lavender".  You should notice that our "ColorIntent" is still hit, and the slot value is actually "lavender", a color we didn't include in our slot!  Slots are machine learning models, and Alexa will interpret unexpected values based on what we provide her in the model.  Since "lavender" seems to be a good fit for our slot, it is provided to us.  This means that we will have to check for appropriate values in our code, and eliminate values we don't want to support.
+15. Navigate back to the "Code" tab, where we will add another handler for our new intent to our index.js file.
 
-8. Navigate back to the "Code" tab, where we will add another handler for our new intent to our index.js file.
+16. Add this handler to your index.js file.  This will send the color commands to our Particle function "toggleColor".
 
-9. 
+```cpp
+const ColorIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ColorIntent';
+    },
+    handle(handlerInput) {
+        var speakOutput = "This skill currently only supports the colors of the rainbow and white.  Please select one of those colors.";
+        if (handlerInput.requestEnvelope.request.intent.slots.color.value !== undefined) {
+            var color = handlerInput.requestEnvelope.request.intent.slots.color.value.toLowerCase();
+            if (["red", "orange", "yellow", "green", "blue", "purple", "white"].indexOf(color) >= 0) {
+                var particle = new Particle();
+                particle.callFunction({ deviceId: deviceId, name: "toggleColor", argument: color, auth: token })
+                speakOutput = "The LED is now " + color;
+            }
+        }
+        return handlerInput.responseBuilder
+            .speak(speakOutput + "<break time='.25s'/>What else can I do for you?")
+            .reprompt("What else can I do for you?")
+            .getResponse();
+    }
+}
+```
+
+17. Make sure to add the name of the handler ("ColorIntentHandler") to the exports.handler list at the bottom of index.js.
+
+18. Save and deploy your code.
+
+19. You can now use the "Test" tab to test your skill using the Alexa Simulator.  Simple commands like "purple" or "red" will work, but more complex statements like "change the light to green" should also work.
+
+CONGRATULATIONS!  You've completed this entire workshop!  You now know how to build an Alexa skill that talks to external APIs.  This is necessary in any advanced voice skill to store data, retrieve content, or even send external communication to your users.  What are you going to build next?
+
+If you got lost in the code, here are some resources for you.
+
+[Interaction Model Final Code]() - In the left navigation of the Build tab in the Alexa Developer Console, you can choose JSON Editor to replace the entire Interaction Model with this file.
+[index.js Final Code]()
+[particle.ino Final Code]()
 
 
 

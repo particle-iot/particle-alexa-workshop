@@ -1,0 +1,105 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "particle control",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "HelloWorldIntent",
+                    "slots": [],
+                    "samples": [
+                        "hello",
+                        "how are you",
+                        "say hi world",
+                        "say hi",
+                        "hi",
+                        "say hello world",
+                        "say hello"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "LightPowerIntent",
+                    "slots": [
+                        {
+                            "name": "OnOff",
+                            "type": "OnOffType"
+                        }
+                    ],
+                    "samples": [
+                        "toggle the LED",
+                        "toggle the light",
+                        "turn {OnOff} the light",
+                        "turn the LED {OnOff}",
+                        "turn the light {OnOff}",
+                        "turn {OnOff} the LED"
+                    ]
+                },
+                {
+                    "name": "TemperatureIntent",
+                    "slots": [],
+                    "samples": [
+                        "what does the temperature sensor say",
+                        "how many degrees is it",
+                        "how hot is it",
+                        "how cold is it",
+                        "temp",
+                        "temperature",
+                        "give me the device temperature",
+                        "give me the temperature",
+                        "what is the temperature"
+                    ]
+                },
+                {
+                    "name": "ColorIntent",
+                    "slots": [
+                        {
+                            "name": "color",
+                            "type": "AMAZON.Color"
+                        }
+                    ],
+                    "samples": [
+                        "change the LED to {color}",
+                        "change the light to {color}",
+                        "set the light to {color}",
+                        "change to {color}",
+                        "{color}",
+                        "set the LED to {color}",
+                        "change the color to {color}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "OnOffType",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "off"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "on"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
