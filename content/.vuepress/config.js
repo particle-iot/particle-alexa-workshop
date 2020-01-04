@@ -17,7 +17,7 @@ module.exports = {
         'Chapter 2: Working with Particle Workbench, Primitives & the Device Cloud'
       ],
       ['/docs/ch3', 'Chapter 3: Building an Alexa Skill'],
-      ['/docs/ch4', 'Chapter 3: Talking to Particle from Alexa']
+      ['/docs/ch4', 'Chapter 4: Talking to Particle from Alexa']
     ]
   },
   title: 'Particle & Alexa Workshop',

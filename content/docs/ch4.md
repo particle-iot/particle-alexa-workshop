@@ -1,4 +1,4 @@
-# Chapter 3: Talking to Particle from Alexa
+# Chapter 4: Talking to Particle from Alexa
 
 | **Project Goal**            | Control your particle device from your Alexa skill.                                                                                                                       |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
