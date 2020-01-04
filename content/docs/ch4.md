@@ -69,7 +69,7 @@ This slot does not currently have a slot type selected, and we need to create on
 
 11. In the left navigation, find your "OnOff" slot that is under your LightPowerIntent, and click on it.
 
-![](./images/04/alexa_onoffslot_in_nav.png)
+![](./images/04/alexa_onoff_slot_in_nav.png)
 
 12. In the "Slot Type" dropdown, select our new "OnOffType" slot type.
 
