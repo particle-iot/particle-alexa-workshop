@@ -54,7 +54,7 @@ Make sure to allow the app to access your camera to complete this step.
 
 ![](./images/01/app-argon-use-in-mesh.png)
 
-8. Conecct your device to the cloud, by providing it with Wi-Fi. Select the Wi-Fi you intend to use, and enter the password.
+8. Connect your device to the cloud, by providing it with Wi-Fi. Select the Wi-Fi you intend to use, and enter the password.
 
 <img src="./images/01/app-argon-choose-wifi.png" class="two-per-line" />
 <img src="./images/01/app-argon-connecting-to-cloud.png" class="two-per-line" />
